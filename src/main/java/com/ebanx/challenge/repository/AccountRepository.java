@@ -21,6 +21,6 @@ public class AccountRepository {
     }
 
     public void deleteAll() {
-        accounts.clear(); // Onde 'storage' é o seu ConcurrentHashMap
+        accounts.clear();
     }
 }
