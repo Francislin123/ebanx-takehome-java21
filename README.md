@@ -1,3 +1,5 @@
+[![CodeQL Advanced](https://github.com/Francislin123/ebanx-takehome-java21/actions/workflows/codeql.yml/badge.svg)](https://github.com/Francislin123/ebanx-takehome-java21/actions/workflows/codeql.yml)
+
 # EBANX Take-home Assignment
 
 A RESTful API for managing financial accounts with deposit, withdrawal, and transfer operations.
