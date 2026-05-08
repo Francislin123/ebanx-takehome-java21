@@ -19,4 +19,8 @@ public class AccountRepository {
         accounts.put(account.getId(), account);
         return account;
     }
+
+    public void deleteAll() {
+        accounts.clear(); // Onde 'storage' é o seu ConcurrentHashMap
+    }
 }

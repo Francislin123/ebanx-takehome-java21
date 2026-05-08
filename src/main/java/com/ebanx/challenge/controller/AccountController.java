@@ -23,4 +23,10 @@ public class AccountController {
     public ResponseEntity<?> event(@RequestBody EventRequest request) {
         return ResponseEntity.status(201).body(service.processEvent(request));
     }
+
+    @PostMapping("/reset")
+    public ResponseEntity<String> reset() {
+        service.reset();
+        return ResponseEntity.ok("OK");
+    }
 }

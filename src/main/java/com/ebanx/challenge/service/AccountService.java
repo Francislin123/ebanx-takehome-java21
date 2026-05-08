@@ -40,6 +40,11 @@ public class AccountService {
         };
     }
 
+    public void reset() {
+        log.info("Resetting all accounts state");
+        repository.deleteAll();
+    }
+
     private void validateAmount(Integer amount) {
         if (amount == null || amount <= 0) {
             log.warn("Invalid amount: {}", amount);
