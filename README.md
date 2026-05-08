@@ -6,12 +6,16 @@ A RESTful API for managing financial accounts with deposit, withdrawal, and tran
 
 ## Stack
 
-- Java 21
-- Spring Boot 3.5.13
-- Maven 3.9
-- JUnit 5 (testing)
-- Swagger/OpenAPI (documentation)
-- In-memory storage (`ConcurrentHashMap`)
+### 🛠️ Tech Stack
+
+| Category | Technologies |
+| :--- | :--- |
+| **Language** | ![Java 21](https://img.shields.io/badge/Java-21-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white) |
+| **Framework** | ![Spring Boot 3.5.13](https://img.shields.io/badge/Spring%20Boot-3.5.13-6DB33F?style=for-the-badge&logo=springboot&logoColor=white) |
+| **Build Tool** | ![Maven](https://img.shields.io/badge/Apache%20Maven-3.9-red?style=for-the-badge&logo=apachemaven&logoColor=white) |
+| **Testing** | ![JUnit 5](https://img.shields.io/badge/JUnit-5-25A162?style=for-the-badge&logo=junit5&logoColor=white) |
+| **Documentation** | ![Swagger](https://img.shields.io/badge/Swagger-OpenAPI%203-85EA2D?style=for-the-badge&logo=openapi-initiative&logoColor=black) |
+| **Storage** | ![In-Memory](https://img.shields.io/badge/Storage-ConcurrentHashMap-blue?style=for-the-badge) |
 
 ## Prerequisites
 
@@ -137,6 +141,8 @@ docker build -t ebanx-challenge .
 # Run the container
 docker run -p 8080:8080 ebanx-challenge
 ```
+### DevSecOps CI/CD Pipeline with Blue/Green Deployment on AWS ECS
+![Captura de Tela 2019-05-12 às 15 18 49](https://res.cloudinary.com/duep7y7ve/image/upload/v1778247968/sng1ye3l71xydyenlywd.jpg)
 
 ## Architecture Notes
 
@@ -144,3 +150,17 @@ docker run -p 8080:8080 ebanx-challenge
 - **Validation**: All amounts must be positive and non-zero. Withdrawals and transfers check for sufficient funds.
 - **Error handling**: Global exception handler maps exceptions to appropriate HTTP status codes (`404`).
 - **Stateless**: Each request is independent; no session or auth management.
+
+# 👨‍💻 Autor
+
+**Francislin Dos Reis**
+
+**Software Engineering**
+
+---
+
+# ⭐ If you liked the project
+
+Leave a **⭐ on the repository** to support development.
+
+---
