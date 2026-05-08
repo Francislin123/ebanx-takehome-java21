@@ -140,5 +140,5 @@ docker run -p 8080:8080 ebanx-challenge
 
 - **In-memory storage**: Uses `ConcurrentHashMap` for simplicity and durability-free design per project requirements.
 - **Validation**: All amounts must be positive and non-zero. Withdrawals and transfers check for sufficient funds.
-- **Error handling**: Global exception handler maps exceptions to appropriate HTTP status codes (`404`, `422`).
+- **Error handling**: Global exception handler maps exceptions to appropriate HTTP status codes (`404`).
 - **Stateless**: Each request is independent; no session or auth management.
