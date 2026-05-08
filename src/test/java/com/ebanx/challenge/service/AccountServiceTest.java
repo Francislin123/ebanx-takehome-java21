@@ -439,4 +439,61 @@ class AccountServiceTest {
             assertTrue(balance > 0, "Balance should be positive after deposits");
         }
     }
+
+    @Nested
+    @DisplayName("Reset State Tests")
+    class ResetStateTests {
+
+        @Test
+        @DisplayName("Should clear all accounts when reset is called")
+        void shouldClearAllAccounts() {
+            // Arrange: Popula o repositório com algumas contas
+            repository.save(new Account("acc-1", 100));
+            repository.save(new Account("acc-2", 200));
+
+            // Act
+            service.reset();
+
+            // Assert: Tentar buscar qualquer conta deve lançar exceção
+            assertThrows(NoSuchElementException.class, () -> service.getBalance("acc-1"));
+            assertThrows(NoSuchElementException.class, () -> service.getBalance("acc-2"));
+        }
+
+        @Test
+        @DisplayName("Should handle reset on already empty repository")
+        void shouldHandleResetOnEmptyRepository() {
+            // Act & Assert: Não deve lançar erro ao resetar um repositório vazio
+            assertDoesNotThrow(() -> service.reset());
+        }
+    }
+
+    @Nested
+    @DisplayName("Repository Integration Tests")
+    class RepositoryIntegrationTests {
+
+        @Test
+        @DisplayName("Should verify persistence across different service calls")
+        void shouldVerifyPersistenceAcrossCalls() {
+            // Simula o fluxo: Criar conta via depósito -> Verificar persistência real
+            var deposit = new EventRequest("deposit", null, "persist-test", 500);
+            service.processEvent(deposit);
+
+            var savedAccount = repository.findById("persist-test");
+
+            assertTrue(savedAccount.isPresent());
+            assertEquals(500, savedAccount.get().getBalance());
+        }
+
+        @Test
+        @DisplayName("Should ensure unique instances in repository")
+        void shouldEnsureUniqueInstances() {
+            repository.save(new Account("unique", 100));
+            var account1 = repository.findById("unique").get();
+            var account2 = repository.findById("unique").get();
+
+            // Verifica se o repositório retorna a mesma referência de objeto (ou estado consistente)
+            assertEquals(account1.getBalance(), account2.getBalance());
+            assertSame(account1, account2, "Repository should manage single instances per ID");
+        }
+    }
 }

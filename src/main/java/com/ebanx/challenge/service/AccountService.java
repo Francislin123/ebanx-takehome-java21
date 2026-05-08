@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.util.Map;
 
 @Service
@@ -61,10 +62,7 @@ public class AccountService {
     }
 
     private Object deposit(EventRequest request) {
-        if (request.destination() == null || request.destination().isBlank()) {
-            log.warn("Null or blank destination for deposit");
-            throw new IllegalArgumentException("Destination account ID is required for deposit");
-        }
+        extracted(request.destination(), "Null or blank destination for deposit", "Destination account ID is required for deposit");
 
         var account = repository.findById(request.destination())
                 .orElse(new Account(request.destination(), 0));
@@ -73,6 +71,10 @@ public class AccountService {
         repository.save(account);
 
         log.info("Deposit successful: account={}, newBalance={}", account.getId(), account.getBalance());
+        return getStringMapMap(account);
+    }
+
+    private static Map<String, Map<String, ? extends Serializable>> getStringMapMap(Account account) {
         return Map.of(
                 "destination",
                 Map.of(
@@ -83,10 +85,7 @@ public class AccountService {
     }
 
     private Object withdraw(EventRequest request) {
-        if (request.origin() == null || request.origin().isBlank()) {
-            log.warn("Null or blank origin for withdrawal");
-            throw new IllegalArgumentException("Origin account ID is required for withdrawal");
-        }
+        extracted(request.origin(), "Null or blank origin for withdrawal", "Origin account ID is required for withdrawal");
 
         var account = repository.findById(request.origin())
                 .orElseThrow(() -> new IllegalArgumentException("Account not found: " + request.origin()));
@@ -107,15 +106,9 @@ public class AccountService {
     }
 
     private Object transfer(EventRequest request) {
-        if (request.origin() == null || request.origin().isBlank()) {
-            log.warn("Null or blank origin for transfer");
-            throw new IllegalArgumentException("Origin account ID is required for transfer");
-        }
+        extracted(request.origin(), "Null or blank origin for transfer", "Origin account ID is required for transfer");
 
-        if (request.destination() == null || request.destination().isBlank()) {
-            log.warn("Null or blank destination for transfer");
-            throw new IllegalArgumentException("Destination account ID is required for transfer");
-        }
+        extracted(request.destination(), "Null or blank destination for transfer", "Destination account ID is required for transfer");
 
         var origin = repository.findById(request.origin())
                 .orElseThrow(() -> new IllegalArgumentException("Account not found: " + request.origin()));
@@ -145,5 +138,12 @@ public class AccountService {
                         "balance", destination.getBalance()
                 )
         );
+    }
+
+    private static void extracted(String request, String s, String s1) {
+        if (request == null || request.isBlank()) {
+            log.warn(s);
+            throw new IllegalArgumentException(s1);
+        }
     }
 }
