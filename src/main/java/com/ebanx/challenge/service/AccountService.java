@@ -3,12 +3,16 @@ package com.ebanx.challenge.service;
 import com.ebanx.challenge.dto.EventRequest;
 import com.ebanx.challenge.model.Account;
 import com.ebanx.challenge.repository.AccountRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
 public class AccountService {
+
+    private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
     private final AccountRepository repository;
 
@@ -17,12 +21,15 @@ public class AccountService {
     }
 
     public Integer getBalance(String accountId) {
+        log.debug("Getting balance for account: {}", accountId);
         return repository.findById(accountId)
                 .map(Account::getBalance)
                 .orElseThrow();
     }
 
     public Object processEvent(EventRequest request) {
+        log.info("Processing event: type={}, origin={}, destination={}, amount={}",
+                request.type(), request.origin(), request.destination(), request.amount());
         validateAmount(request.amount());
 
         return switch (request.type()) {
@@ -35,18 +42,22 @@ public class AccountService {
 
     private void validateAmount(Integer amount) {
         if (amount == null || amount <= 0) {
+            log.warn("Invalid amount: {}", amount);
             throw new IllegalArgumentException("Amount must be a positive, non-zero value");
         }
     }
 
     private void validateSufficientFunds(Account account, Integer amount) {
         if (account.getBalance() < amount) {
+            log.warn("Insufficient funds for account: {}, balance: {}, requested: {}",
+                    account.getId(), account.getBalance(), amount);
             throw new IllegalArgumentException("Insufficient funds for account: " + account.getId());
         }
     }
 
     private Object deposit(EventRequest request) {
         if (request.destination() == null || request.destination().isBlank()) {
+            log.warn("Null or blank destination for deposit");
             throw new IllegalArgumentException("Destination account ID is required for deposit");
         }
 
@@ -54,9 +65,9 @@ public class AccountService {
                 .orElse(new Account(request.destination(), 0));
 
         account.setBalance(account.getBalance() + request.amount());
-
         repository.save(account);
 
+        log.info("Deposit successful: account={}, newBalance={}", account.getId(), account.getBalance());
         return Map.of(
                 "destination",
                 Map.of(
@@ -68,6 +79,7 @@ public class AccountService {
 
     private Object withdraw(EventRequest request) {
         if (request.origin() == null || request.origin().isBlank()) {
+            log.warn("Null or blank origin for withdrawal");
             throw new IllegalArgumentException("Origin account ID is required for withdrawal");
         }
 
@@ -77,9 +89,9 @@ public class AccountService {
         validateSufficientFunds(account, request.amount());
 
         account.setBalance(account.getBalance() - request.amount());
-
         repository.save(account);
 
+        log.info("Withdrawal successful: account={}, newBalance={}", account.getId(), account.getBalance());
         return Map.of(
                 "origin",
                 Map.of(
@@ -91,10 +103,12 @@ public class AccountService {
 
     private Object transfer(EventRequest request) {
         if (request.origin() == null || request.origin().isBlank()) {
+            log.warn("Null or blank origin for transfer");
             throw new IllegalArgumentException("Origin account ID is required for transfer");
         }
 
         if (request.destination() == null || request.destination().isBlank()) {
+            log.warn("Null or blank destination for transfer");
             throw new IllegalArgumentException("Destination account ID is required for transfer");
         }
 
@@ -112,6 +126,8 @@ public class AccountService {
         repository.save(origin);
         repository.save(destination);
 
+        log.info("Transfer successful: origin={}, destination={}, amount={}",
+                origin.getId(), destination.getId(), request.amount());
         return Map.of(
                 "origin",
                 Map.of(
